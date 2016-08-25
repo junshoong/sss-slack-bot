@@ -1,1 +1,2 @@
-slack_token = None
+SLACK_TOKEN = ''
+PREFIX = '!'
