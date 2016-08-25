@@ -27,7 +27,7 @@ class Bot(object):
 
     def cognize(self, messages):
         for channel, text in messages:
-            if PREFIX in text:
+            if PREFIX not in text:
                 continue
 
             if self.check_in_read(eating, text):
