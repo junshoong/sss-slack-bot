@@ -1,9 +1,9 @@
 import os, time
-import re
+from config import *
 from slackclient import SlackClient
 
 
-token = os.environ.get('SLACK_TOKEN')
+token = os.environ.get(slack_token)
 client = SlackClient(token)
 
 if client.rtm_connect():
