@@ -1,20 +1,26 @@
 import time
 from config import *
 from slackclient import SlackClient
+from importlib import import_module
 
 eating = ['밥', '뭐 먹', '뭐먹']
+PREFIX = '!'
 
 class Bot(object):
 
     def __init__(self):
         self.client = SlackClient(SLACK_TOKEN)
+        self.apps = self.import_apps()
 
-    def check_in_read(self, words, parsed):
-        if parsed:
-            for word in words:
-                if word in parsed:
-                    return True
-        return False
+    def import_apps(self):
+        apps = {}
+        for app_name in APPS:
+            app = import_module('apps.%s' % app_name)
+            func = getattr(app, "on_message")
+            print("import %s.%s" % (app_name, func))
+            apps[app_name] = func
+
+        return apps
 
     def commands_info(self, commands):
         messages = []
@@ -27,11 +33,25 @@ class Bot(object):
 
     def cognize(self, messages):
         for channel, text in messages:
-            if PREFIX not in text:
+            if PREFIX != text[0]:
                 continue
 
-            if self.check_in_read(eating, text):
-                self.client.rtm_send_message(channel, '학식먹어')
+            command, args = self.extract_text(text)
+            app = self.apps.get(command, None)
+            if not app:
+                continue
+
+            self.client.rtm_send_message(channel, app(args))
+
+    def extract_text(self, text):
+        string = text[1:].split(' ', 1)
+        command = string[0]
+        if len(string) > 1:
+            args = string[1]
+        else:
+            args = None
+
+        return command, args
 
     def connect(self):
         if not self.client.rtm_connect():
@@ -43,7 +63,7 @@ class Bot(object):
                 messages = self.commands_info(commands)
                 self.cognize(messages)
 
-            time.sleep(0.01)
+            time.sleep(0.2)
 
 if '__main__' == __name__:
     bot = Bot()
