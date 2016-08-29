@@ -14,3 +14,6 @@ slack에서 Bot을 추가한 뒤에 나오는 token `config.py`파일의 `SLACK_
 $ pip install -r Requirements.txt
 $ python bot.py
 ```
+
+슬랙에 접속해서 봇에게 DM이나 봇이 있는 채널에서 명령을 내리면 됩니다.
+`![명령]` 명령은 apps에 있는 `.py`파일명과 동일합니다.
